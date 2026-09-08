@@ -3,88 +3,82 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FAST-PETase 3D Filtration Capsule UI</title>
+  <title>FAST-PETase Filtration Capsule - 3D Interactive Model</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { 
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      background-color: #0b1320; 
-      color: #e2e8f0; 
-      overflow: hidden; 
-      height: 100vh;
+    body {
+      margin: 0;
+      overflow: hidden;
+      background-color: #081116;
+      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: #e2e8f0;
     }
     
-    #canvas-container { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
+    #canvas-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+    }
     
-    /* UI Overlay Panels */
     .ui-panel {
       position: absolute;
       z-index: 10;
-      background: rgba(15, 23, 42, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      border-radius: 12px;
-      padding: 18px;
-      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+      background: rgba(12, 24, 33, 0.85);
+      border: 1px solid rgba(42, 157, 143, 0.3);
+      backdrop-filter: blur(10px);
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
     }
     
-    .ui-header {
-      top: 20px; left: 20px; width: 320px;
-    }
-    .ui-controls {
-      bottom: 20px; left: 20px; width: 320px;
-    }
-    .ui-stats {
-      top: 20px; right: 20px; width: 280px;
-    }
+    .ui-left { top: 20px; left: 20px; width: 340px; }
+    .ui-right { top: 20px; right: 20px; width: 280px; }
+    .ui-bottom { bottom: 20px; left: 20px; }
 
-    h1 { font-size: 1.1rem; color: #38bdf8; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-    p { font-size: 0.85rem; color: #94a3b8; line-height: 1.4; }
+    h1 { margin: 0 0 5px 0; font-size: 1.2rem; color: #48cae4; text-transform: uppercase; letter-spacing: 1px; }
+    h2 { margin: 15px 0 5px 0; font-size: 0.9rem; color: #2a9d8f; text-transform: uppercase; }
+    p { margin: 0; font-size: 0.85rem; color: #a8dadc; line-height: 1.5; }
     
+    ul { margin: 5px 0 0 15px; padding: 0; font-size: 0.85rem; color: #a8dadc; }
+    li { margin-bottom: 4px; }
+
     .btn {
-      width: 100%;
-      padding: 10px 14px;
-      margin-top: 10px;
-      background: #0284c7;
+      background: #2a9d8f;
+      color: #fff;
       border: none;
-      color: #ffffff;
-      font-weight: 600;
-      font-size: 0.85rem;
-      border-radius: 6px;
+      padding: 10px 15px;
+      border-radius: 4px;
+      font-weight: bold;
       cursor: pointer;
-      transition: background 0.2s ease;
+      transition: background 0.3s;
+      width: 100%;
+      margin-top: 15px;
     }
-    .btn:hover { background: #0369a1; }
-    
-    .toggle-group {
+    .btn:hover { background: #21867a; }
+
+    .control-group {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      margin-top: 12px;
-      font-size: 0.85rem;
+      align-items: center;
+      margin-top: 15px;
+      font-size: 0.9rem;
     }
 
-    /* Switch styling */
-    .switch {
-      position: relative; display: inline-block; width: 44px; height: 22px;
-    }
+    /* Toggle Switch */
+    .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
     .switch input { opacity: 0; width: 0; height: 0; }
     .slider {
       position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-      background-color: #334155; transition: .4s; border-radius: 22px;
+      background-color: #2b2b2b; transition: .4s; border-radius: 20px;
     }
     .slider:before {
-      position: absolute; content: ""; height: 16px; width: 16px; left: 3px; bottom: 3px;
+      position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px;
       background-color: white; transition: .4s; border-radius: 50%;
     }
-    input:checked + .slider { background-color: #10b981; }
-    input:checked + .slider:before { transform: translateX(22px); }
-
-    .spec-item {
-      display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.8rem;
-    }
-    .spec-label { color: #64748b; }
-    .spec-val { color: #f1f5f9; font-weight: 500; }
+    input:checked + .slider { background-color: #2a9d8f; }
+    input:checked + .slider:before { transform: translateX(20px); }
   </style>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -94,149 +88,193 @@
 
   <div id="canvas-container"></div>
 
-  <div class="ui-panel ui-header">
-    <h1>FAST-PETase Capsule</h1>
-    <p>3D-Printed Microplastic Degradation Sphere</p>
+  <div class="ui-panel ui-left">
+    <h1>FAST-PETase Filter Ball</h1>
+    <p>3D-Printed Microplastic Degradation Matrix</p>
     
-    <div class="toggle-group">
+    <h2>Layer 1: Outer Shell</h2>
+    <p>Matte green-blue PHA biodegradable layer. Features micro-pores calibrated strictly to admit microplastics.</p>
+    
+    <h2>Layer 2: Filtration Matrix</h2>
+    <p>3D-printed honeycomb lattice that traps microplastics, preventing reverse flow back into the water.</p>
+    
+    <h2>Core & Enzyme Payload</h2>
+    <ul>
+      <li><strong>Rigid Core:</strong> Solid base to balance the sphere at the deployment surface.</li>
+      <li><strong>Enzymes:</strong> FAST-PETase beads injected post-printing, strongly seated in the honeycomb lattice.</li>
+    </ul>
+  </div>
+
+  <div class="ui-panel ui-right">
+    <h1>Visualization Controls</h1>
+    
+    <div class="control-group">
       <span>Cutaway View</span>
       <label class="switch">
-        <input type="checkbox" id="cutawayToggle" onchange="toggleCutaway(this.checked)">
+        <input type="checkbox" id="cutawayToggle" checked onchange="toggleView(this.checked)">
         <span class="slider"></span>
       </label>
     </div>
-  </div>
 
-  <div class="ui-panel ui-controls">
-    <button class="btn" onclick="resetCamera()">Reset View</button>
-    
-    <div class="toggle-group">
-      <span>Auto-Rotation</span>
+    <div class="control-group">
+      <span>Auto-Rotate</span>
       <label class="switch">
-        <input type="checkbox" id="rotateToggle" checked onchange="toggleRotation(this.checked)">
+        <input type="checkbox" checked onchange="toggleRotation(this.checked)">
         <span class="slider"></span>
       </label>
     </div>
+
+    <button class="btn" onclick="resetCamera()">Reset Camera</button>
   </div>
 
-  <div class="ui-panel ui-stats">
-    <h1>Specifications</h1>
-    <div class="spec-item"><span class="spec-label">Diameter:</span><span class="spec-val">3.5 cm</span></div>
-    <div class="spec-item"><span class="spec-label">Layer 1:</span><span class="spec-val">PHA Porous Shell</span></div>
-    <div class="spec-item"><span class="spec-label">Layer 2:</span><span class="spec-val">Honeycomb Matrix</span></div>
-    <div class="spec-item"><span class="spec-label">Active Core:</span><span class="spec-val">FAST-PETase Beads</span></div>
-    <div class="spec-item"><span class="spec-label">Flow Direction:</span><span class="spec-val">Unidirectional</span></div>
+  <div class="ui-panel ui-bottom">
+    <p><strong>Design Specs:</strong> Max Size: 3-5cm | Color Palette: Matte Green/Blue</p>
   </div>
 
   <script>
     let scene, camera, renderer, controls;
-    let mainGroup, shellMesh, cutawayShellMesh, matrixGroup, beadsGroup;
+    let mainGroup, cutawayShell, fullShell;
     let autoRotate = true;
 
     function init() {
-      // Scene
+      // 1. Scene Setup
       scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x0b1320);
+      scene.fog = new THREE.FogExp2(0x081116, 0.05);
 
-      // Camera
-      camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
-      camera.position.set(6, 4, 8);
+      // 2. Camera Setup
+      camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1000);
+      camera.position.set(5, 3, 6);
 
-      // Renderer
+      // 3. Renderer Setup
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
       renderer.setPixelRatio(window.devicePixelRatio);
       document.getElementById('canvas-container').appendChild(renderer.domElement);
 
-      // Orbit Controls
+      // 4. Controls
       controls = new THREE.OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
       controls.dampingFactor = 0.05;
+      controls.minDistance = 3;
+      controls.maxDistance = 15;
 
-      // Lights
-      const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+      // 5. Lighting (Optimized for Matte and Glowing elements)
+      const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
       scene.add(ambientLight);
 
-      const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
-      dirLight.position.set(10, 15, 10);
-      scene.add(dirLight);
+      const topLight = new THREE.DirectionalLight(0xffffff, 0.8);
+      topLight.position.set(5, 10, 5);
+      scene.add(topLight);
 
-      const bluePointLight = new THREE.PointLight(0x38bdf8, 1.5, 10);
-      bluePointLight.position.set(0, 0, 0);
-      scene.add(bluePointLight);
+      const coreGlow = new THREE.PointLight(0x00f5d4, 1.5, 8);
+      coreGlow.position.set(0, 0, 0);
+      scene.add(coreGlow);
 
-      // Main Capsule Group
+      // 6. Build the 3D Model
       mainGroup = new THREE.Group();
       scene.add(mainGroup);
 
       buildCapsule();
 
-      // Window Resize Event
+      // 7. Event Listeners
       window.addEventListener('resize', onWindowResize);
 
+      // 8. Start Loop
       animate();
     }
 
     function buildCapsule() {
-      // 1. Layer 1: Outer PHA Perforated Shell (Beige/Tan)
-      const shellGeo = new THREE.SphereGeometry(2.5, 64, 64);
-      const shellMat = new THREE.MeshStandardMaterial({
-        color: 0xe3d5ca,
-        roughness: 0.6,
-        metalness: 0.1
+      // --- THE RIGID BALANCE CORE ---
+      // Solid core to balance the ball at the surface, as requested.
+      const coreGeo = new THREE.SphereGeometry(0.8, 32, 32);
+      const coreMat = new THREE.MeshStandardMaterial({ 
+        color: 0x1d3557, // Deep Navy/Blue
+        roughness: 0.8 
       });
+      const rigidCore = new THREE.Mesh(coreGeo, coreMat);
+      mainGroup.add(rigidCore);
 
-      shellMesh = new THREE.Mesh(shellGeo, shellMat);
-      mainGroup.add(shellMesh);
-
-      // Cutaway version of outer shell
-      const cutawayGeo = new THREE.SphereGeometry(2.5, 64, 64, 0, Math.PI * 1.5);
-      cutawayShellMesh = new THREE.Mesh(cutawayGeo, shellMat);
-      cutawayShellMesh.visible = false;
-      mainGroup.add(cutawayShellMesh);
-
-      // 2. Layer 2: Honeycomb Lattice (Beige/Gold)
-      matrixGroup = new THREE.Group();
-      const matrixGeo = new THREE.IcosahedronGeometry(2.1, 2);
-      const matrixMat = new THREE.MeshStandardMaterial({
-        color: 0xd4a373,
+      // --- LAYER 2: HONEYCOMB FILTRATION LATTICE ---
+      // Using an Icosahedron wireframe to perfectly mimic a 3D printed structural lattice
+      const latticeGeo = new THREE.IcosahedronGeometry(1.6, 3);
+      const latticeMat = new THREE.MeshStandardMaterial({ 
+        color: 0x48cae4, // Light Blue/Green
         wireframe: true,
-        wireframeLinewidth: 3
+        transparent: true,
+        opacity: 0.8
       });
-      const matrixMesh = new THREE.Mesh(matrixGeo, matrixMat);
-      matrixGroup.add(matrixMesh);
-      mainGroup.add(matrixGroup);
+      const lattice = new THREE.Mesh(latticeGeo, latticeMat);
+      mainGroup.add(lattice);
 
-      // 3. Green FAST-PETase Enzyme Beads (Matching uploaded image)
-      beadsGroup = new THREE.Group();
-      const beadGeo = new THREE.CapsuleGeometry ? new THREE.CapsuleGeometry(0.25, 0.35, 8, 16) : new THREE.SphereGeometry(0.3, 16, 16);
+      // --- ENZYME BEADS ---
+      // Injected post-printing into the honeycomb lattice
+      const beadGeo = new THREE.SphereGeometry(0.12, 16, 16);
       const beadMat = new THREE.MeshStandardMaterial({
-        color: 0x10b981,
-        roughness: 0.2,
-        metalness: 0.1,
-        emissive: 0x047857,
-        emissiveIntensity: 0.3
+        color: 0x00f5d4, // Bright Cyan/Green
+        emissive: 0x00a896,
+        emissiveIntensity: 0.5,
+        roughness: 0.2
       });
 
-      // Place several enzyme beads inside the matrix lattice
-      const beadPositions = [
-        [0, 0, 0], [0.8, 0.5, 0.4], [-0.7, -0.4, 0.6], 
-        [0.5, -0.8, -0.3], [-0.6, 0.7, -0.5], [0.2, 0.9, -0.2]
-      ];
-
-      beadPositions.forEach(pos => {
+      // Scatter beads between the rigid core and the outer shell
+      for (let i = 0; i < 45; i++) {
         const bead = new THREE.Mesh(beadGeo, beadMat);
-        bead.position.set(...pos);
-        bead.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-        beadsGroup.add(bead);
+        
+        // Calculate random positions within the lattice radius
+        const radius = 1.0 + Math.random() * 0.5; 
+        const theta = Math.random() * Math.PI * 2;
+        const phi = Math.acos(2 * Math.random() - 1);
+        
+        bead.position.set(
+          radius * Math.sin(phi) * Math.cos(theta),
+          radius * Math.sin(phi) * Math.sin(theta),
+          radius * Math.cos(phi)
+        );
+        mainGroup.add(bead);
+      }
+
+      // --- LAYER 1: PHA BIODEGRADABLE OUTER SHELL (MATTE) ---
+      const shellRadius = 2.2;
+      const shellMatteMat = new THREE.MeshStandardMaterial({
+        color: 0x2a9d8f, // Matte Green/Teal
+        roughness: 1.0,  // Completely matte finish
+        metalness: 0.0,
+        side: THREE.DoubleSide
       });
 
-      mainGroup.add(beadsGroup);
+      // Pores Simulation Material (Overlay layer to look like 3D printed pores)
+      const poreMat = new THREE.PointsMaterial({
+        color: 0x1d3557,
+        size: 0.04,
+        transparent: true,
+        opacity: 0.6
+      });
+
+      // Cutaway Version (Default View)
+      const cutawayGeo = new THREE.SphereGeometry(shellRadius, 64, 64, 0, Math.PI * 1.5);
+      cutawayShell = new THREE.Group();
+      cutawayShell.add(new THREE.Mesh(cutawayGeo, shellMatteMat));
+      cutawayShell.add(new THREE.Points(cutawayGeo, poreMat)); // Adds the pore texture
+      mainGroup.add(cutawayShell);
+
+      // Full Enclosed Version (Hidden by default)
+      const fullGeo = new THREE.SphereGeometry(shellRadius, 64, 64);
+      fullShell = new THREE.Group();
+      fullShell.add(new THREE.Mesh(fullGeo, shellMatteMat));
+      fullShell.add(new THREE.Points(fullGeo, poreMat)); // Adds the pore texture
+      fullShell.visible = false;
+      mainGroup.add(fullShell);
+      
+      // Tilt the model slightly for a better initial view
+      mainGroup.rotation.x = 0.3;
     }
 
-    function toggleCutaway(isCutaway) {
-      shellMesh.visible = !isCutaway;
-      cutawayShellMesh.visible = isCutaway;
+    // UI Interactive Functions
+    function toggleView(isCutaway) {
+      if (cutawayShell && fullShell) {
+        cutawayShell.visible = isCutaway;
+        fullShell.visible = !isCutaway;
+      }
     }
 
     function toggleRotation(shouldRotate) {
@@ -244,8 +282,9 @@
     }
 
     function resetCamera() {
-      camera.position.set(6, 4, 8);
-      controls.reset();
+      camera.position.set(5, 3, 6);
+      controls.target.set(0, 0, 0);
+      controls.update();
     }
 
     function onWindowResize() {
@@ -258,13 +297,14 @@
       requestAnimationFrame(animate);
 
       if (autoRotate && mainGroup) {
-        mainGroup.rotation.y += 0.005;
+        mainGroup.rotation.y += 0.003;
       }
 
       controls.update();
       renderer.render(scene, camera);
     }
 
+    // Initialize the scene
     init();
   </script>
 </body>
